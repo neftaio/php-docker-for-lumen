@@ -5,12 +5,12 @@ RUN apt-get install -y libgmp-dev libpng-dev libfreetype6-dev libjpeg62-turbo-de
     default-mysql-client libmagickwand-dev cron zlib1g-dev libzip-dev \ 
     curl  git \ 
     --no-install-recommends
+
 # Install NODE
-# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash 
-# RUN bash -c "source /root/.bashrc && nvm install node" 
 SHELL ["/bin/bash", "--login", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash 
 RUN nvm install 13.5.0 && nvm use 13.5.0 
+
 # Install exetencions
 RUN pecl install imagick \
     && docker-php-ext-enable imagick \
@@ -20,19 +20,14 @@ RUN pecl install imagick \
     && docker-php-ext-install pdo_mysql \
     && docker-php-ext-install zip
 
-# RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-#     && docker-php-ext-install gd
 RUN docker-php-ext-configure gd \
     && docker-php-ext-install gd
 RUN docker-php-ext-install calendar && docker-php-ext-configure calendar
 
-# 
 # Configurations for PHP config init
-# 
 RUN touch /usr/local/etc/php/conf.d/espconfig.ini \
     && echo "upload_max_filesize = 50M;" >> /usr/local/etc/php/conf.d/espconfig.ini \
     && echo "max_execution_time = 300;" >> /usr/local/etc/php/conf.d/espconfig.ini
-
 
 # Install composer
 ENV COMPOSER_HOME /composer
@@ -42,11 +37,6 @@ RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/
 
 # Install PHP_CodeSniffer
 RUN composer global require "squizlabs/php_codesniffer=*"
-
-# 
-# Permisos
-# 
-# RUN chown -R www-data:www-data /var/www
 
 # Setup working directory
 WORKDIR /var/www
