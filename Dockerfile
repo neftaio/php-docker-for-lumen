@@ -3,7 +3,7 @@ FROM php:7.4-fpm
 RUN apt-get update 
 RUN apt-get install -y libgmp-dev libpng-dev libfreetype6-dev libjpeg62-turbo-dev unzip \
     default-mysql-client libmagickwand-dev cron zlib1g-dev libzip-dev \ 
-    curl  git \ 
+    curl  git cron htop supervisor libxml2-dev \ 
     --no-install-recommends
 
 # Install NODE
@@ -18,7 +18,14 @@ RUN pecl install imagick \
     && docker-php-ext-configure gmp \
     && docker-php-ext-install gmp \
     && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install zip
+    && docker-php-ext-install zip \
+    && docker-php-ext-install simplexml
+
+# Installing IMAP for PHP
+# RUN apt update && apt install -y libc-client-dev libkrb5-dev && rm -r /var/lib/apt/lists/*
+RUN apt update && apt install -y libc-client-dev libkrb5-dev
+RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+    && docker-php-ext-install imap
 
 RUN docker-php-ext-configure gd \
     && docker-php-ext-install gd
